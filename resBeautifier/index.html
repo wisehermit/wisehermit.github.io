@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="ie9 ie8 ie7 ie6" lang="en"><![endif]-->
+<!--[if IE 7]><html class="ie9 ie8 ie7" lang="en"><![endif]-->
+<!--[if IE 8]><html class="ie9 ie8" lang="en"><![endif]-->
+<!--[if IE 9]><html class="ie9" lang="en"><![endif]-->
+<!--[if gt IE 9]><!--><html lang="en"><!--<![endif]-->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>BaseDemo - ResBeautifier</title>
+  
+  <!-- 
+    Include BaseDemo
+    
+    BaseDemo is a code demoing tool for displaying demos the easiest way possible
+    It is not required for the demo to work and should not be included in your
+    implementation of the demoed code on your projects.
+    
+    For more on BaseDemo here: https://github.com/sebnitu/BaseDemo
+  -->
+  <script src="assets/bootstrap.js"></script>
+  
+  <!--
+  
+  Things you could use find & replace to update:
+  ** To-Do: This should be done later in JS through a config file **
+  {{project-name}}
+  {{project-url}}
+  {{project-download-url}}
+  
+  {{author-name}}
+  {{author-url}}
+  
+  License; visit the link below for more info on choosing a license
+  http://creativecommons.org/
+  
+  {{license-name}}
+  {{license-url}}
+  
+  -->
+  
+  <!-- CSS Test Zone -->
+  <style></style>
+  
+  <!-- JavaScript Test Zone -->
+  <script></script>
+  
+</head>
+<body>
+
+  <div class="wrapper">
+    <div class="page">
+    
+      <nav class="nav">
+        <ul>
+          <li><a href="https://github.com/wisehermit/resBeautifier">Project on GitHub</a></li>
+          <li class="download"><a href="https://wisehermit.github.io/resBeautifier/resbeautifier.user.js">Установить <span class="version">v1.0</span></a></li>
+        </ul>
+      </nav>
+    
+      <header class="header">
+        <h1>ResBeautifier <span class="version">v1.0</span></h1>
+        <p>Дополнение расширяющее функциональность склада<p>
+        <div class="custom-nav"></div>
+      </header>
+      
+      <div class="sep"><span class="left-arrow arrow"></span><span class="right-arrow arrow"></span></div>
+      
+      <div class="demo" id="demo-one">
+        <div class="description">
+          <h2>Описание</h2>
+          <p>
+          Дополнение добавляет данные по проценту заполненности склада и прогноз по времени достижения лимита (заполнение склада при увеличении количества ресурса, или окончание ресурса при его уменьшении).<br />
+          <br />
+          Под каждым ресурсом присутствует шкала отражающая текущий объем ресурса и динамику его изменения. Может быть 4х цветов:</p>
+          
+          <br />
+
+          <div class="table-wrap">
+            <table width="100%" class="options-table" cellpadding="0" cellspacing="0">
+              <thead>
+                <tr>
+                  <th width="15%">Цвет</th>
+                  <th>Описание</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="text-align: center;"> <div style="margin:0 15px; border-bottom: 2px #6eba8b solid; width: 50px;"></div> </td>
+                  <td>Количество ресурса увеличивается</td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;"> <div style="margin:0 15px; border-bottom: 2px #e15f52 solid; width: 50px;"></div> </td>
+                  <td>Количество ресурса уменьшается</td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;"> <div style="margin:0 15px; border-bottom: 2px #9999ff solid; width: 50px;"></div> </td>
+                  <td>Количество ресурса не изменяется</td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;"> <div style="margin:0 15px; border-bottom: 2px #b681b4 solid; width: 50px;"></div> </td>
+                  <td>Достигнут предел вместимости хранилища</td>
+                </tr>
+              </tbody>
+            </table>
+          </div><!-- .table-wrap -->
+
+          <p>
+          <img src="assets/science.png" style="float: left; margin: 0 20px 20px 0;">
+          Красный и зеленый цвет меняют насыщенность в зависимости от количества ресурса. Чем ближе лимит, тем насыщеннее цвет.
+          
+          <br />
+          <br />
+
+          У знаний отражается время необходимое для накопления 100% объема передачи (6 часов 40 минут при 60% мудрецов). Если объем передачи больше либо равен 100% - время до автоматической передачи знаний.
+          
+          <br />
+          <br />
+
+          У денег отражается время до автоматической передачи в казну, либо время до окончания текущего запаса денег в городе.</p>
+        </div>
+      </div>
+
+      <div class="sep"><span class="left-arrow arrow"></span><span class="right-arrow arrow"></span></div>
+
+      <div class="demo" id="demo-one">
+        <div class="description">
+          <h2>Напоминания</h2>
+          <p>
+          <img src="assets/notifications.png" style="float: right; margin: 0 0 20px 20px;">
+          В дополнении реализован механизм напоминания при достижении указанного количества ресурса. При срабатывании уведомления под ресурсом появляется сообщение о достижении лимита и запускается звуковое оповещение.<br />
+          <br />
+          Хранение таких уведомлений является "сессионным", т.е. информация об установленных лимитах хранится до тех пор пока не будет закрыт браузер. Срабатывание уведомление приводит к удалению информации о нем, таким образом на повторное достижение лимита система никак не отреагирует. Смена города приводит к обнулению всех установленных ранее уведомлений, т.к. не существует достаточно достоверного и "законного" способа отслеживать количество ресурсов в других городах.</p>
+          
+          <p></p>
+
+        </div><!-- .description -->
+
+      </div><!-- .demo -->
+      
+
+      
+      
+    </div><!-- .page -->
+    
+    <footer class="footer">
+      <p><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">ResBeautifier</span> is built and maintained by <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/wisehermit" property="cc:attributionName" rel="cc:attributionURL">Wise Hermit</a>. Follow me on <a href="https://github.com/wisehermit">GitHub</a>.</p>
+    </footer>
+    
+  </div><!-- .wrapper -->
+
+</body>
+</html>
