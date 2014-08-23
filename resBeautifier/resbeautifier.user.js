@@ -5,7 +5,7 @@
 // @author         Wise Hermit
 // @updateURL      https://wisehermit.github.io/resBeautifier/resbeautifier.meta.js
 // @downloadURL    https://wisehermit.github.io/resBeautifier/resbeautifier.user.js
-// @version        1.1
+// @version        1.2
 // @grant          none
 // ==/UserScript==
 
@@ -150,7 +150,7 @@ function ResBeautifier() {
         var storemaxSpan = this.createElement('span', {
             'id': 'storemax'
         });
-        storemaxSpan.innerHTML = this.resources_max;
+        storemaxSpan.innerHTML = Math.floor(this.resources_max);
 
         $(storemaxLink).append(storemaxSpan);
 
@@ -385,8 +385,8 @@ function ResBeautifier() {
                 rbn[i][3] = this.resources[rbn[i][1]].alter;
                 rbn[i][5] = wofh.time;
             }
-            // wofh.town.id, resId, current, alter, value, this.getTimestamp()
-            var current = (rbn[i][2] + rbn[i][3] / 3600 * (this.getTimestamp() + this.offsetTime - rbn[i][5])).toFixed();
+
+            var current = Math.floor(rbn[i][2] + rbn[i][3] / 3600 * (this.getTimestamp() + this.offsetTime - rbn[i][5]));
             if ((rbn[i][2] < rbn[i][4] && current >= rbn[i][4]) || (rbn[i][2] > rbn[i][4] && current <= rbn[i][4])) {
                 
                 this.showNotification(rbn[i][0], rbn[i][1], rbn[i][4]);
@@ -582,7 +582,7 @@ function ResBeautifier() {
             }
 
             if (resId > 1 && !wofh.account.research.ability.money) {
-                type = lib.resource.data[resId].prodtype--;
+                type = lib.resource.data[resId].prodtype - 1;
             }
 
             var alteration  = wofh.core.calcResourceAlteration(wofh.town, {'budget': 1, stream: 0, cons: 0, consumption: 0, buildStatic: 0 }, resId),
