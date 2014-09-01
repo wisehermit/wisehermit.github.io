@@ -5,7 +5,7 @@
 // @author         Wise Hermit
 // @updateURL      https://wisehermit.github.io/resBeautifier/resbeautifier.meta.js
 // @downloadURL    https://wisehermit.github.io/resBeautifier/resbeautifier.user.js
-// @version        1.2
+// @version        1.3
 // @grant          none
 // ==/UserScript==
 
@@ -20,6 +20,8 @@ function ResBeautifier() {
 
     this.resources = {};
     this.resources_max = 0;
+    
+    this.population = {};
 
     this.townlist = {};
     
@@ -31,8 +33,8 @@ function ResBeautifier() {
         '.resBeautifier { height:20px; margin-bottom:1px; border-bottom:1px #bbb solid; }',
         '.resBeautifier  div { float:left; overflow:visible; white-space:nowrap; line-height:20px; width:50px; }',
         '.resBeautifier .progressbar { float:none; border-bottom:2px #99f solid; width:0px; height:20px; }',
-        '#resBeautifier .rbNotification { margin:10px 0px; font-size:1.1em; display:none; line-height:18px; width:225px; }',
-        '#resBeautifier .storemax { display:block; color:#000; font-weight:bold; text-align:center; padding-bottom:10px; width:100%; }'
+        '.rbNotification { margin:10px 0px; font-size:1.1em; display:none; line-height:18px; width:225px; }',
+        '.storemax { display:block; color:#000; font-weight:bold; text-align:center; padding-bottom:10px; width:100%; }'
     ];
 
     this.colors = {
@@ -105,6 +107,28 @@ function ResBeautifier() {
 
         }
 
+        // Population
+        this.population = {
+            'current':    wofh.town.pop.has,
+            'culture':    wofh.town.pop.culture,
+            'alteration': wofh.town.pop.incReal,
+        };
+        
+        this.population.initial = this.population.current;
+
+        // pop like a res
+        this.resources['p'] = {
+            name:    'Население',
+            current: parseFloat(this.population.current),
+            alter:   parseFloat(this.population.alteration)
+        };
+        
+        this.resources['p'].initial = this.resources['p'].current;
+
+        if(isNaN(this.population.current)) {
+            this.population.current = 0;
+        }
+
         // Создаем основной враппер и заполняем его ресурсами
         this.buildResourceBlock();
         
@@ -166,6 +190,10 @@ function ResBeautifier() {
 
         // Добавляем ресурсы
         for (var resId in this.resources) {
+
+            if(resId == 'p') {
+                continue;
+            }
 
             // one more wrapper. this is madness.
             var wrapper = this.createElement('div', {
@@ -274,6 +302,82 @@ function ResBeautifier() {
 
         }
 
+        // Population
+        $('.chcol2.chcol_p1 .aC').remove();
+
+        var wrapper = this.createElement('div', {
+            'class': 'resBeautifier',
+            'style': 'margin-bottom: 10px'
+        });
+
+        var iconImg = this.createElement('img', {
+            'src':   this.dotImg,
+            'class': 'res rp',
+        });
+
+        var iconDiv = this.createElement('div', {
+            'style': 'width:140px'
+        });
+
+        var popDataSpan = this.createElement('span', {
+            'id': 'rbCurrentp'
+        });
+        popDataSpan.innerHTML = '0/0 (+0.0)';
+
+        $(iconDiv).append(iconImg)
+                  .append(popDataSpan);
+
+        $(wrapper).append(iconDiv);
+
+        var percentDiv = this.createElement('div', {
+            'id': 'rbPercentp',
+            'style': 'width:40px',
+        });
+        percentDiv.innerHTML = '&nbsp;';
+
+        var timeleftDiv = this.createElement('div', {
+            'id':    'rbTimeleftp',
+            'style': 'width:60px'
+        });
+        timeleftDiv.innerHTML = '&nbsp;';
+
+        var progressBarDiv = this.createElement('div', {
+            'id':    'rbProgressBarp',
+            'class': 'progressbar'
+        });
+
+        $(wrapper).append(percentDiv)
+                  .append(timeleftDiv);
+
+        var dropdownDiv = this.createElement('div', {
+            'style': 'width:2px;position:relative'
+        });
+
+        var dropdownImg = this.createElement('img', {
+            'src':      this.dotImg,
+            'class':   'icsort2',
+            'style':   'cursor:pointer',
+        });
+
+        dropdownImg.onclick = function(x) {
+            return function() {
+                resBeautifier.showNotificationForm(x);
+            };
+        }('p');
+
+        $(dropdownDiv).append(dropdownImg);
+
+        $(wrapper).append(dropdownDiv)
+                  .append(progressBarDiv);
+
+        var notificationDiv = this.createElement('div', {
+            'id':    'rbNotificationp',
+            'class': 'acont rbNotification',
+        });
+
+        $('.chcol2.chcol_p1').prepend(notificationDiv)
+                             .prepend(wrapper);
+
     };
     
 
@@ -301,6 +405,43 @@ function ResBeautifier() {
         // current value
         $('#rbNotification' + resId + ' img').after(this.smartRound(this.resources[resId].current, 5));
 
+        var rbn = JSON.parse(this.getCookie('rbNotifications') || '{}');
+        if (typeof rbn[wofh.town.id + resId] != 'undefined') {
+        
+            $('#rbNotification' + resId).append(this.createElement('div'));
+
+            var notificationSpan = this.createElement('span', {
+                'style': 'float:left;width:90px;clear:both'
+            });
+            notificationSpan.innerHTML = 'Установлено:';
+
+            $('#rbNotification' + resId).append(notificationSpan);
+
+
+            var iconImg = this.createElement('img', {
+                'src':   this.dotImg,
+                'class': 'res r' + resId,
+                'title': this.resources[resId].name
+            });
+
+            $('#rbNotification' + resId).append(iconImg);
+
+            $('#rbNotification' + resId + ' img:last').after(this.smartRound(rbn[wofh.town.id + resId][4], 5));
+
+            var delLink = this.createElement('a', {
+                'href': '#'
+            });
+
+            $(delLink).click(function(x) {
+                return function() {
+                    resBeautifier.delNotification(x);
+                    return false;
+                };
+            }(resId)).append('удалить');
+
+            $('#rbNotification' + resId).append(' (').append(delLink).append(')');
+
+        }
 
         notificationSpan = this.createElement('span', {
             'style': 'float:left;width:90px;clear:both'
@@ -349,17 +490,30 @@ function ResBeautifier() {
         for (var resId in this.resources) {
 
             var elapsed = this.getTimestamp() + this.offsetTime - wofh.time;
-            this.resources[resId].current = this.resources[resId].initial + this.resources[resId].alter / 3600 * elapsed;
+            this.resources[resId].current = this.resources[resId].initial + this.resources[resId].alter / (resId == 'p' ? 86400 : 3600) * elapsed;
 
             if (this.resources[resId].current < 0) {
                 this.resources[resId].current = 0;
             }
 
-            if (resId > 1 && this.resources[resId].current > this.resources_max) {
+            if (resId == 'p' && this.population.current > this.population.culture) {
+                this.population.current = this.population.culture;
+            } else if (resId > 1 && this.resources[resId].current > this.resources_max) {
                 this.resources[resId].current = this.resources_max;
             }
 
-            $('#rbCurrent' + resId).html(this.smartRound(this.resources[resId].current, 5));
+            if (resId == 'p') {
+
+                var curPop = Math.floor(this.resources[resId].current) + '/' + Math.floor(this.population.culture)
+                           + ' (' + (this.population.alteration >= 0 ? '+' : '') + this.smartRound(this.population.alteration, 4) + ')';
+
+                $('#rbCurrent' + resId).html(curPop);
+
+            } else {
+
+                $('#rbCurrent' + resId).html(this.smartRound(this.resources[resId].current, 5));
+
+            }
 
             var percent = this.getPercent(resId);
             $('#rbPercent' + resId).html(percent + '%');
@@ -370,6 +524,7 @@ function ResBeautifier() {
             $('#rbTimeleft' + resId).html(timeleft)
                                     .css('color', timeleft == '00:00:00' ? '#d33' : '#000');
 
+            $('#rbTimeleft' + resId).attr('title', this.getTimeLeft(resId, true));
 
             this.setProgressBar(resId, percent);
 
@@ -386,7 +541,7 @@ function ResBeautifier() {
                 rbn[i][5] = wofh.time;
             }
 
-            var current = Math.floor(rbn[i][2] + rbn[i][3] / 3600 * (this.getTimestamp() + this.offsetTime - rbn[i][5]));
+            var current = Math.floor(rbn[i][2] + rbn[i][3] / (rbn[i][1] == 'p' ? 86400 : 3600) * (this.getTimestamp() + this.offsetTime - rbn[i][5]));
             if ((rbn[i][2] < rbn[i][4] && current >= rbn[i][4]) || (rbn[i][2] > rbn[i][4] && current <= rbn[i][4])) {
                 
                 this.showNotification(rbn[i][0], rbn[i][1], rbn[i][4]);
@@ -428,15 +583,26 @@ function ResBeautifier() {
             max = Math.abs(this.resources[resId].alter) * 8.0000;
         }
 
-        this.resources[resId].percent = Math.floor(this.resources[resId].current / (Math.round(max) / 100)); // r>f
+        if (resId == 'p') {
+            max = this.population.culture;
+        }
+        
+        if(this.resources[resId].current >= max) {
+            this.resources[resId].percent = 100;
+        } else {
+            this.resources[resId].percent = Math.floor(this.resources[resId].current / (Math.round(max) / 100)); // r>f
+        }
+
         return this.resources[resId].percent;
 
     };
 
 
-    this.getTimeLeft = function (resId) {
+    this.getTimeLeft = function (resId, endtime) {
 
-        if (this.resources[resId].alter == 0) {
+        endtime = endtime || false;
+
+        if (resId != 'p' && this.resources[resId].alter == 0) {
             return;
         }
 
@@ -452,7 +618,29 @@ function ResBeautifier() {
             boundary = this.resources[resId].alter * 8.0000;
         }
 
-        var seconds = (boundary - this.resources[resId].current) / this.resources[resId].alter * 3600;
+        if (resId == 'p') {
+            boundary = this.resources[resId].alter > 0 ? this.population.culture : 0;
+        }
+
+        var seconds = (boundary - this.resources[resId].current) / (this.resources[resId].alter / (resId != 'p' ? 1 : 24)) * 3600;
+
+        if (endtime) {
+
+            if(seconds <= 0) {
+                return 'already';
+            }
+
+            var timezoneOffset = (new Date).getTimezoneOffset() * 60 + servodata.account.timezone * 3600;
+            var date = new Date((this.getTimestamp() + this.offsetTime + seconds + timezoneOffset) * 1000);
+
+            return value = ('0' + date.getHours()).slice(-2) + ':'
+                         + ('0' + date.getMinutes()).slice(-2) + ':'
+                         + ('0' + date.getSeconds()).slice(-2) + ' '
+                         + ('0' + date.getDate()).slice(-2) + '.'
+                         + ('0' + (date.getMonth() + 1)).slice(-2) + '.'
+                         + date.getFullYear();
+
+        }
 
         if (seconds < 0) {
             return '00:00:00';
@@ -489,7 +677,8 @@ function ResBeautifier() {
         }
 
         if (this.resources[resId].alter != 0 && percent != 100) {
-            color = this.colors[this.resources[resId].alter > 0 ? 'g' : 'r'][Math.floor(percent / 10)];
+            var colKey = Math.floor(percent / 10);
+            color = this.colors[this.resources[resId].alter > 0 && resId != 'p' ? 'g' : 'r'][resId == 'p' ? 10 - colKey : colKey];
         }
 
         $('#rbProgressBar' + resId).css('width', percent + '%')
@@ -522,6 +711,22 @@ function ResBeautifier() {
         });
         
         $('#rbNotification' + resId).html('Установлено')
+                                    .delay(1000).fadeOut(500);
+
+    };
+
+
+    this.delNotification = function (resId) {
+
+        var notifications = JSON.parse(this.getCookie('rbNotifications') || '{}');
+
+        delete notifications[wofh.town.id + resId];
+
+        this.setCookie('rbNotifications', JSON.stringify(notifications), {
+            domain: '.wofh.ru'
+        });
+        
+        $('#rbNotification' + resId).html('Удалено')
                                     .delay(1000).fadeOut(500);
 
     };
