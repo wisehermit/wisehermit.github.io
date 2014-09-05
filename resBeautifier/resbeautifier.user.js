@@ -5,7 +5,7 @@
 // @author         Wise Hermit
 // @updateURL      https://wisehermit.github.io/resBeautifier/resbeautifier.meta.js
 // @downloadURL    https://wisehermit.github.io/resBeautifier/resbeautifier.user.js
-// @version        1.3
+// @version        1.4
 // @grant          none
 // ==/UserScript==
 
@@ -155,8 +155,8 @@ function ResBeautifier() {
         // Для поддержки повторной инициализации
         $('#resBeautifier').remove();
 
-        // Удаляем стандартный склад
-        $('.chcol1.chcol_p1:first').remove();
+        // Скрываем стандартный склад
+        $('.chcol1.chcol_p1:first').hide();
 
         // Создаем основной враппер
         var resBeautifierWrapper = this.createElement('div', {
