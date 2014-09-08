@@ -496,9 +496,7 @@ function ResBeautifier() {
                 this.resources[resId].current = 0;
             }
 
-            if (resId == 'p' && this.population.current > this.population.culture) {
-                this.population.current = this.population.culture;
-            } else if (resId > 1 && this.resources[resId].current > this.resources_max) {
+            if (resId != 'p' && resId > 1 && this.resources[resId].current > this.resources_max) {
                 this.resources[resId].current = this.resources_max;
             }
 
@@ -524,7 +522,11 @@ function ResBeautifier() {
             $('#rbTimeleft' + resId).html(timeleft)
                                     .css('color', timeleft == '00:00:00' ? '#d33' : '#000');
 
-            $('#rbTimeleft' + resId).attr('title', this.getTimeLeft(resId, true));
+
+            if (resId == 'p' && (percent >= 95 || this.resources['p'].current > this.population.culture)) {
+                $('#rbCurrent' + resId).css('color', '#d33')
+                                       .css('font-weight', 'bold');
+            }
 
             this.setProgressBar(resId, percent);
 
@@ -586,8 +588,8 @@ function ResBeautifier() {
         if (resId == 'p') {
             max = this.population.culture;
         }
-        
-        if(this.resources[resId].current >= max) {
+
+        if(resId != 0 && resId != 'p' && this.resources[resId].current >= max) {
             this.resources[resId].percent = 100;
         } else {
             this.resources[resId].percent = Math.floor(this.resources[resId].current / (Math.round(max) / 100)); // r>f
