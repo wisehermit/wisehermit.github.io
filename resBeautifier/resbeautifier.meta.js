@@ -5,6 +5,6 @@
 // @author         Wise Hermit
 // @updateURL      https://wisehermit.github.io/resBeautifier/resbeautifier.meta.js
 // @downloadURL    https://wisehermit.github.io/resBeautifier/resbeautifier.user.js
-// @version        1.4
+// @version        1.5
 // @grant          none
 // ==/UserScript==

@@ -5,7 +5,7 @@
 // @author         Wise Hermit
 // @updateURL      https://wisehermit.github.io/resBeautifier/resbeautifier.meta.js
 // @downloadURL    https://wisehermit.github.io/resBeautifier/resbeautifier.user.js
-// @version        1.4
+// @version        1.5
 // @grant          none
 // ==/UserScript==
 
@@ -790,12 +790,18 @@ function ResBeautifier() {
                 type = lib.resource.data[resId].prodtype - 1;
             }
 
-            var alteration  = wofh.core.calcResourceAlteration(wofh.town, {'budget': 1, stream: 0, cons: 0, consumption: 0, buildStatic: 0 }, resId),
-
+            var alteration  = 0,
                 stream      = wofh.town.resources.stream[resId],
                 cons        = wofh.town.resources.cons[resId],
                 consumption = core.calcResourceConsumption(wofh.town, resId),
                 buildStatic = wofh.town.resources.buildStatic[resId];
+
+
+            if(resId == 0) {
+                alteration = wofh.core.calcResourceAlteration(wofh.town, {'budget': 1}, 0);
+            } else {
+                alteration = wofh.core.calcResourceAlteration(wofh.town, {'budget': 1, stream: 0, cons: 0, consumption: 0, buildStatic: 0}, resId);
+            }
 
             
             var value = (alteration / 100 * $('#sp' + type).val())
