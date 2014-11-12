@@ -5,7 +5,7 @@
 // @author         Wise Hermit
 // @updateURL      https://wisehermit.github.io/resBeautifier/resbeautifier.meta.js
 // @downloadURL    https://wisehermit.github.io/resBeautifier/resbeautifier.user.js
-// @version        1.5
+// @version        1.6
 // @grant          none
 // ==/UserScript==
 
@@ -24,6 +24,8 @@ function ResBeautifier() {
     this.population = {};
 
     this.townlist = {};
+
+    this.res_separators = [5, 11, 17, 22];
     
     this.timeoutHandler = null;
     this.offsetTime = 0;
@@ -187,22 +189,29 @@ function ResBeautifier() {
                                .append(notificationArea)
                                .insertAfter('.extop');
 
+        var has_margin = false;
 
         // Добавляем ресурсы
-        for (var resId in this.resources) {
+        for (var resId = 0; resId <= 22; resId++) {
+            if(!has_margin && (((!wofh.account.research.ability.money && resId == 1) || resId == 2) || $.inArray(resId, this.res_separators) >= 0)) {
+                var separator = this.createElement('div', {
+                    'style': 'margin-bottom:8px;'
+                });
+                $(resBeautifierWrapper).append(separator);
+                has_margin = true;
+            }
 
-            if(resId == 'p') {
+            if (typeof this.resources[resId] == 'undefined' || resId == 'p') {
                 continue;
             }
+
+            has_margin = false;
+
 
             // one more wrapper. this is madness.
             var wrapper = this.createElement('div', {
                 'class': 'resBeautifier'
             });
-
-            if(((!wofh.account.research.ability.money && resId == 0) || resId == 1) || resId == 3) {
-                wrapper.setAttribute('style', 'margin-bottom:10px;');
-            }
 
             var iconImg = this.createElement('img', {
                 'src':   this.dotImg,
@@ -222,7 +231,7 @@ function ResBeautifier() {
             // Если это наука или деньги - создаем ссылку для слива
             if (resId <= 1) {
                 var upLink = this.createElement('a', {
-                    'href': resId == 0 ? '/scienceup' : '/moneyup'
+                    'onclick': resId == 0 ? '$("#scienceup").click();' : '$("#moneyup").click();'
                 });
                 $(upLink).append(iconImg);
 
@@ -307,7 +316,7 @@ function ResBeautifier() {
 
         var wrapper = this.createElement('div', {
             'class': 'resBeautifier',
-            'style': 'margin-bottom: 10px'
+            'style': 'margin-bottom: 8px'
         });
 
         var iconImg = this.createElement('img', {
@@ -341,11 +350,6 @@ function ResBeautifier() {
         });
         timeleftDiv.innerHTML = '&nbsp;';
 
-        var progressBarDiv = this.createElement('div', {
-            'id':    'rbProgressBarp',
-            'class': 'progressbar'
-        });
-
         $(wrapper).append(percentDiv)
                   .append(timeleftDiv);
 
@@ -367,8 +371,7 @@ function ResBeautifier() {
 
         $(dropdownDiv).append(dropdownImg);
 
-        $(wrapper).append(dropdownDiv)
-                  .append(progressBarDiv);
+        $(wrapper).append(dropdownDiv);
 
         var notificationDiv = this.createElement('div', {
             'id':    'rbNotificationp',
@@ -523,12 +526,15 @@ function ResBeautifier() {
                                     .css('color', timeleft == '00:00:00' ? '#d33' : '#000');
 
 
-            if (resId == 'p' && (percent >= 95 || this.resources['p'].current > this.population.culture)) {
+            var pop_limit_left = (this.population.culture - this.resources['p'].current) / (this.resources['p'].alter / 24) * 3600;
+            if (resId == 'p' && (pop_limit_left < 86400 || this.resources['p'].current > this.population.culture)) {
                 $('#rbCurrent' + resId).css('color', '#d33')
                                        .css('font-weight', 'bold');
             }
 
-            this.setProgressBar(resId, percent);
+            if (resId != 'p') {
+                this.setProgressBar(resId, percent);
+            }
 
         }
 
